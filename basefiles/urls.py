@@ -1,0 +1,5 @@
+from django.conf.urls import patterns, include, url
+
+urlpatterns = patterns('',
+    url(r'^showlog/', 'showlog.showlog.give_test', name='Unified Logs'),
+)
