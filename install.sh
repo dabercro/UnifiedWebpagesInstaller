@@ -6,6 +6,10 @@
 
 installName=$1
 
+# I'm going to look for django here
+
+prefixLoc=$HOME/www/python_test/django
+
 # Get desired installation name from the user.
 
 if [ "$installName" = "" ]
@@ -42,14 +46,10 @@ fileLoc=`dirname $0`
 cd ~/www
 
 # Look for django installation
-adminCommand=`which django-admin.py`
-if [ "$adminCommand" = "" ]
+
+if [ ! -d $prefixLoc/lib/python2.6/site-packages ]
 then
-    adminCommand=`which django-admin`
-fi
-if [ "$adminCommand" = "" ]
-then
-    # If it can't be found, time to install
+    # It needs to be installed in ~/www
     # This is mostly straight from the AFS page, so that should be safe, right?
 
     wget https://www.djangoproject.com/m/releases/1.6/Django-1.6.5.tar.gz
@@ -58,17 +58,24 @@ then
 
     # Now I'm making up stuff
     cd django
-    python2.6 setup.py install --prefix=~/.local
-    PATH=$PATH:~/.local/bin
-    adminCommand=`which django-admin.py`
+    python2.6 setup.py install --prefix=$prefixLoc
+    cd $prefixLoc
+    wget https://pypi.python.org/packages/2.6/f/flup/flup-1.0.2-py2.6.egg
+fi
 
-    if [ "$adminCommand" = "" ]
-    then
-        echo "This script did not work as I was expecting..."
-        echo "Get django-admin installed on here, then try again."
-        cd $whereAmI
-        exit 0
-    fi
+PYTHONPATH=$prefixLoc/lib/python2.6/site-packages:$PYTHONPATH
+PATH=$prefixLoc/bin:$PATH
+adminCommand=`which django-admin.py`
+if [ "$adminCommand" = "" ]
+then
+    adminCommand=`which django-admin`
+fi
+if [ "$adminCommand" = "" ]
+then
+    echo "This script did not work as I was expecting..."
+    echo "Get django-admin installed on here, then try again."
+    cd $whereAmI
+    exit 0
 fi
 
 cd ~/www
@@ -76,10 +83,11 @@ $adminCommand startproject $installName
 
 # Now start placing template files.
 
-sedCommand="sed 's/SHOWLOGSNAMEHERE/$installName/g'"
+cd $whereAmI
 
-$sedCommand $fileLoc/basefiles/SHOWLOGSNAMEHERE.fcgi > ~/www/cgi-bin/$installName.fcgi
-$sedCommand $fileLoc/basefiles/htaccess > ~/www/$installName/.htaccess
+sed "s@PROJECTNAMENAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@DJANGOPREFIX@$prefixLoc/lib/python2.6/site-packages@g" | sed "s@FLUPLOCATION@$prefixLoc/g" > ~/www/cgi-bin/$installName.fcgi
+chmod +x ~/www/cgi-bin/$installName.fcgi
+sed "s@PROJECTNAMENAMEHERE@$installName@g" $fileLoc/basefiles/htaccess > ~/www/$installName/.htaccess
 
 cp $fileLoc/basefiles/urls.py ~/www/$installName/$installName/.
 
@@ -99,6 +107,5 @@ cp -r $fileLoc/showlog/* ~/www/$installName/showlog/.
 
 # Done!
 
-cd $whereAmI
 echo "Nothing seemed to break. Try out this url:"
-echo "$USER.web.cern.ch/$USER/$installName"
+echo "$USER.web.cern.ch/$USER/$installName/showlog"
