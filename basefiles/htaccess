@@ -2,4 +2,4 @@ Options +ExecCGI
 AddHandler cgi-bin .cgi .fcgi
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ ../cgi-bin/PROJECTNAMENAMEHERE.fcgi/$1 [QSA,L]
+RewriteRule ^(.*)$ ../cgi-bin/PROJECTNAMEHERE.fcgi/$1 [QSA,L]
