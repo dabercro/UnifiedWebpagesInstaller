@@ -9,7 +9,7 @@ installName=$1
 # I'm going to look for django here
 # Feel free to change it, but it still has to be in your ~/www for the server I think
 
-prefixLoc=$HOME/www/python1/django
+prefixLoc=$HOME/www/python_test/django
 
 # Get desired installation name from the user.
 
@@ -64,10 +64,13 @@ then
 
     # Now I'm making up stuff
     cd Django-1.6.5
-    # I should make this quieter
-    python2.6 setup.py install --prefix=$prefixLoc
+
+    echo "Installing Django..."
+    python2.6 setup.py install --prefix=$prefixLoc --quiet
     cd ..
+    echo "Cleaning up..."
     rm -rf Django-1.6.5
+
     cd $prefixLoc
     wget https://pypi.python.org/packages/2.6/f/flup/flup-1.0.2-py2.6.egg
 fi
@@ -127,6 +130,9 @@ then
 fi
 
 cp -r $fileLoc/showlog/* ~/www/$installName/showlog/.
+
+# Finally, install showlog into Django
+sed -i "s/INSTALLED_APPS = (/INSTALLED_APPS = ( 'showlog',/g" ~/www/$installName/$installName/settings.py
 
 echo "Nothing seemed to break. Try out this url:"
 

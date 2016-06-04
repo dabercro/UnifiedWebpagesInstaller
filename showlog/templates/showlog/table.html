@@ -3,24 +3,24 @@
 
   <head>
     <title>Unified Logs</title>
-    <link rel="stylesheet" type="text/css" href="showlog/style.css">
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="static/showlog/style.css">
   </head>
 
   <body>
     <table border="3" style="border-collapse: collapse;">
       {% for log in logs %}
         <tr>
-          <th width=60px><div class="foo {{ log.subject }}"></div></th>
+          <th width=60px><div class="box {{ log.subject }}"></div></th>
           <th>{{ log.subject }}</th>
           <th>{{ log.date }}</th>
         </tr>
         <tr>
           <td colspan="3">
-            <p>
               {% for line in log.text %}
                 {{ line }} <br>
               {% endfor %}
-            </p>
+              <br>
           </td>
         </tr>
       {% endfor %}
@@ -29,7 +29,7 @@
     <h3>Meta Data:</h3>
     
     {% for line in meta %}
-      {{ line }}
+      {{ line }} <br>
     {% endfor %}
 
   </body>
