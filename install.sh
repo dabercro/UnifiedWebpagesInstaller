@@ -9,7 +9,7 @@ installName=$1
 # I'm going to look for django here
 # Feel free to change it, but it still has to be in your ~/www for the server I think
 
-prefixLoc=$HOME/www/python/django
+prefixLoc=$HOME/www/python_test/django
 
 # Get desired installation name from the user.
 
@@ -97,7 +97,7 @@ cd $whereAmI
 
 # Copy a couple of files with adjustments for user settings
 
-sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@DJANGOPREFIX@$prefixLoc/lib/python2.6/site-packages@g" | sed "s@FLUPLOCATION@$prefixLoc/g" > ~/www/cgi-bin/$installName.fcgi
+sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@DJANGOPREFIX@$prefixLoc/lib/python2.6/site-packages@g" | sed "s@FLUPLOCATION@$prefixLoc@g" > ~/www/cgi-bin/$installName.fcgi
 chmod +x ~/www/cgi-bin/$installName.fcgi
 sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/htaccess > ~/www/$installName/.htaccess
 
