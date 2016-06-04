@@ -138,6 +138,6 @@ echo "Nothing seemed to break. Try out this url:"
 
 # Again, only have showlog, which might change
 
-echo "$USER.web.cern.ch/$USER/$installName/showlog"
+echo "$USER.web.cern.ch/$USER/$installName"
 
 # Done!
