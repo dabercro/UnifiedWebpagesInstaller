@@ -62,8 +62,8 @@ def give_logs(request):
                 continue
 
             res += '<tr><th width=60px><div class="foo '+i['_source']['subject']+'"></div></th><th>' 
-            res += i['_source']['subject'] + '</th><th>' + i['_source']['date'] + '</th></tr><tr><td colspan="3"><br>'
-            res += i['_source']['text'].replace('\n','<br>') + '<br></td></tr>'
+            res += i['_source']['subject'] + '</th><th>' + i['_source']['date'] + '</th></tr><tr><td colspan="3">'
+            res += i['_source']['text'].replace('\n','<br>') + '<br><br></td></tr>'
 
             texts.add( i['_source']['text'] )
 

@@ -9,7 +9,7 @@ installName=$1
 # I'm going to look for django here
 # Feel free to change it, but it still has to be in your ~/www for the server I think
 
-prefixLoc=$HOME/www/python_test/django
+prefixLoc=$HOME/www/python1/django
 
 # Get desired installation name from the user.
 
@@ -54,13 +54,20 @@ then
     # It needs to be installed in ~/www
     # This is mostly straight from the AFS page, so that should be safe, right?
 
-    wget https://www.djangoproject.com/m/releases/1.6/Django-1.6.5.tar.gz
-    tar -zxvf Django-1.6.5.tar.gz
-    mv Django-1.6.5 django
+    if [ ! -f Django-1.6.5.tar.gz ]
+    then
+        wget https://www.djangoproject.com/m/releases/1.6/Django-1.6.5.tar.gz
+    fi
+
+    echo "Extracting Django..."
+    tar -zxf Django-1.6.5.tar.gz
 
     # Now I'm making up stuff
-    cd django
+    cd Django-1.6.5
+    # I should make this quieter
     python2.6 setup.py install --prefix=$prefixLoc
+    cd ..
+    rm -rf Django-1.6.5
     cd $prefixLoc
     wget https://pypi.python.org/packages/2.6/f/flup/flup-1.0.2-py2.6.egg
 fi
