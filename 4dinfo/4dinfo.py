@@ -45,8 +45,8 @@ def return_page(request):
             toappend = []
             pietitle = 'site: ' + site
             for row in curs.execute('SELECT numberErrors, errorcode FROM workflows WHERE stepName=? AND siteName=?',(step,site)):
-                toappend.append(row[0])
                 if row[0] != 0:
+                    toappend.append(row[0])
                     pietitle += '\ncode ' + str(row[1]) + ': ' + str(row[0])
             pieinfo.append(toappend)
             pietitlerow.append(pietitle.rstrip('\n'))

@@ -11,6 +11,7 @@ function drawpiecharts() {
     var ncanvases = Math.min(canvases.length, arguments.length);
     for (iChart = 0; iChart < ncanvases; iChart++) {
         var data = arguments[iChart];
+        data.sort(function(a, b){return b-a});
         var total = 0;
         for (var point in data)
             total += data[point];
