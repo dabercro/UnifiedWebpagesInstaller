@@ -41,7 +41,7 @@ def give_logs(request):
     input = request.GET.get('search','')
     if input == '':
         # Get form page
-        return HttpResponse('enter a value at the end of the url with ?search=SomeValue<br>Example: <a href=http://dabercro.web.cern.ch/dabercro/unified/showlog/?search=SUS-RunIISummer15wmLHEGS-00038>http://dabercro.web.cern.ch/dabercro/unified/showlog/?search=SUS-RunIISummer15wmLHEGS-00038</a>')
+        return HttpResponse('Submit query: <form><input type="text" name="search"> <input type="submit" value="Submit"></form>')
 
     else:
         o = search_logs(input)

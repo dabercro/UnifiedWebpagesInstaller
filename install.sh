@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# This is an installer used to install the ShowLogs webpage on your very own AFS space on lxplus.
-# Yes, it only works there.
-# This is in case you want me to make changes to my own page but I don't like you or something.
+# This is an installer used to install webpages on your very own AFS space on lxplus.
 
 installName=$1
 
@@ -48,7 +46,7 @@ cd ~/www
 
 # Look for django installation
 
-if [ ! -d $prefixLoc/lib/python2.6/site-packages ]
+if [ ! -d $prefixLoc/lib/python2.6/site-packages/django ]
 then
 
     # It needs to be installed in ~/www
@@ -70,10 +68,34 @@ then
     cd ..
     echo "Cleaning up..."
     rm -rf Django-1.6.5
+fi
 
+# Install flup, if needed
+
+if [ ! -f $prefixLoc/flup-1.0.2-py2.6.egg ]
+then
     cd $prefixLoc
     wget https://pypi.python.org/packages/2.6/f/flup/flup-1.0.2-py2.6.egg
 fi
+
+# # Install specific matplotlib version
+# 
+# if [ ! -d $prefixLoc/lib64/python2.6/site-packages/matplotlib ]
+# then
+#     if [ ! -f matplotlib-1.1.1.tar.gz ]
+#     then
+#         wget https://pypi.python.org/packages/c5/01/be962989489dfda03f5f049fbe53c0e10c7f771f3ced5fcc724851ad4bad/matplotlib-1.1.1.tar.gz
+#     fi
+# 
+#     echo "Extracting matplotlib..."
+#     tar -zxf matplotlib-1.1.1.tar.gz
+#     cd matplotlib-1.1.1
+# 
+#     python2.6 setup.py install --prefix=$prefixLoc
+#     cd ..
+#     echo "Cleaning up..."
+#     rm -rf matplotlib-1.1.1
+# fi
 
 # We'll need these for setup and to point the server to, but otherwise, you can forget them
 
@@ -107,7 +129,7 @@ cd $whereAmI
 
 # Copy a couple of files with adjustments for user settings
 
-sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@DJANGOPREFIX@$prefixLoc/lib/python2.6/site-packages@g" | sed "s@FLUPLOCATION@$prefixLoc@g" > ~/www/cgi-bin/$installName.fcgi
+sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@PREFIXLOC@$prefixLoc@g" > ~/www/cgi-bin/$installName.fcgi
 chmod +x ~/www/cgi-bin/$installName.fcgi
 sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/htaccess > ~/www/$installName/.htaccess
 
@@ -115,29 +137,28 @@ sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/htaccess > ~/www/$inst
 
 cp $fileLoc/basefiles/urls.py ~/www/$installName/$installName/.
 
-# Right now, we only have the showlog page, but let's make it
-
-if [ ! -d ~/www/$installName/showlog ]
-then
-    mkdir ~/www/$installName/showlog
-    if [ $? -ne 0 ]
+for pack in `cat packages.txt`
+do
+    if [ ! -d ~/www/$installName/$pack ]
     then
-        echo "That should have been possible..."
-        echo "Where is ~/www/$installName ???"
-        cd $whereAmI
-        exit 0
+        mkdir ~/www/$installName/$pack
+        touch ~/www/$installName/$pack/__init__.py
+        if [ $? -ne 0 ]
+        then
+            echo "That should have been possible..."
+            echo "Where is ~/www/$installName ???"
+            cd $whereAmI
+            exit 0
+        fi
     fi
-fi
+    
+    cp -r $fileLoc/$pack/* ~/www/$installName/$pack/.
+done
 
-cp -r $fileLoc/showlog/* ~/www/$installName/showlog/.
-
-# Finally, install showlog into Django
-sed -i "s/INSTALLED_APPS = (/INSTALLED_APPS = ( 'showlog',/g" ~/www/$installName/$installName/settings.py
+# Finally, install packages into Django... have to automate package listing
+sed -i "s/INSTALLED_APPS = (/INSTALLED_APPS = ( 'showlog', '4dinfo',/g" ~/www/$installName/$installName/settings.py
 
 echo "Nothing seemed to break. Try out this url:"
-
-# Again, only have showlog, which might change
-
-echo "$USER.web.cern.ch/$USER/$installName"
+echo "$USER.web.cern.ch/$USER/"
 
 # Done!

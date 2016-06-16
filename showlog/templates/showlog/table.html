@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html lang=en>
-
   <head>
     <title>Unified Logs</title>
     {% load staticfiles %}
@@ -8,6 +7,13 @@
   </head>
 
   <body>
+
+    <form>
+      Submit another query:
+      <input type="text" name="search">
+      <input type="submit" name="Submit">
+    </form>
+
     <table border="3" style="border-collapse: collapse;">
       {% for log in logs %}
         <tr>
