@@ -1,0 +1,2 @@
+showlog
+4dinfo

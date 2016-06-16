@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Error Numbers</title>
+    {% load staticfiles %}
+    <script type="text/javascript" src="static/4dinfo/piechart.js"></script>
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+  </head>
+  <body onload="drawpiecharts([10,20,30],[0,2,0]);">
+    <canvas id="canvas" width="30" height="30" class="piechart"></canvas>
+    <canvas id="canvas" width="30" height="30" class="piechart"></canvas>
+  </body>
+</html>
