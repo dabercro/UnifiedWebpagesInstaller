@@ -8,8 +8,18 @@
       canvas { border: 1px solid black; }
     </style>
   </head>
-  <body onload="drawpiecharts([10,20,30],[0,2,0]);">
-    <canvas id="canvas" width="30" height="30" class="piechart"></canvas>
-    <canvas id="canvas" width="30" height="30" class="piechart"></canvas>
+  <body onload="drawpiecharts({{ pieinfo|join:',' }});">
+    {% with site_list|length as numsites %}
+      {% spaceless %}
+
+        {% for info in pieinfo %}
+          <canvas id="canvas" width="25" height="25" class="piechart"></canvas>
+          {% if forloop.counter|divisibleby:numsites %}
+          <br>
+          {% endif %}
+        {% endfor %}
+
+      {% endspaceless %}
+    {% endwith %}
   </body>
 </html>

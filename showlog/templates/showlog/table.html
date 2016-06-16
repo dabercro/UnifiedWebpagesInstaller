@@ -23,10 +23,12 @@
         </tr>
         <tr>
           <td colspan="3">
+            {% spaceless %}
               {% for line in log.text %}
                 {{ line }} <br>
               {% endfor %}
               <br>
+            {% endspaceless %}
           </td>
         </tr>
       {% endfor %}
