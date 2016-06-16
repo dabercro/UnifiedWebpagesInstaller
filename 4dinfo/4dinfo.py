@@ -18,6 +18,8 @@ def return_page(request):
     allerrors = set()
     allsites = set()
 
+    # Store everything into an SQL database for fast retrival
+
     for stepname in data.keys():
         allsteps.add(stepname)
         requestname = ''
@@ -30,17 +32,32 @@ def return_page(request):
                 numbererrors = data[stepname][errorcode][sitename]
                 curs.execute('INSERT INTO workflows VALUES (?,?,?,?,?)',(stepname, requestname, errorcode, sitename, numbererrors))
 
+    # Based on the dimesions from the user, create a list of pies to show
+
     pieinfo = []
+    pietitles = []
+    passstep = []
     for step in allsteps:
+        passstep.append({'name' : step, 'parent' : step.split('/')[1]})
+        pietitlerow = []
         for site in allsites:
             errorNum = 0
             toappend = []
-            for row in curs.execute('SELECT numberErrors FROM workflows WHERE stepName=? AND siteName=?',(step,site)):
+            pietitle = 'site: ' + site
+            for row in curs.execute('SELECT numberErrors, errorcode FROM workflows WHERE stepName=? AND siteName=?',(step,site)):
                 toappend.append(row[0])
+                if row[0] != 0:
+                    pietitle += '\ncode ' + str(row[1]) + ': ' + str(row[0])
             pieinfo.append(toappend)
+            pietitlerow.append(pietitle.rstrip('\n'))
+
+        pietitles.append(pietitlerow)
+
+    steps_titles = zip(passstep, pietitles)
 
     return render(request,'4dinfo/piecharts.html',{
-            'step_list' : allsteps,
             'site_list' : allsites,
             'pieinfo' : pieinfo,
+            'steps_titles' : steps_titles,
             })
+

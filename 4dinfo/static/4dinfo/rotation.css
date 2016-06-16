@@ -1,0 +1,19 @@
+.tips {
+    white-space: pre-wrap;
+}
+
+th {
+    font-size: 70%;
+}
+
+th.rotate {
+  height: 150px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform: 
+    translate(0px, 50px)
+    rotate(270deg);
+  width: 20px;
+}

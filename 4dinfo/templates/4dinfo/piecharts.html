@@ -3,23 +3,27 @@
   <head>
     <title>Error Numbers</title>
     {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="static/4dinfo/rotation.css"></link>
     <script type="text/javascript" src="static/4dinfo/piechart.js"></script>
-    <style type="text/css">
-      canvas { border: 1px solid black; }
-    </style>
   </head>
   <body onload="drawpiecharts({{ pieinfo|join:',' }});">
-    {% with site_list|length as numsites %}
+    <table border="3" style="border-collapse: collapse;">
       {% spaceless %}
-
-        {% for info in pieinfo %}
-          <canvas id="canvas" width="25" height="25" class="piechart"></canvas>
-          {% if forloop.counter|divisibleby:numsites %}
-          <br>
-          {% endif %}
+      <tr>
+        <th></th>
+        {% for site in site_list %}
+        <th class="rotate"><div><span>{{ site }}</span></div></th>
         {% endfor %}
-
-      {% endspaceless %}
-    {% endwith %}
+      </tr>
+      {% for step,title_list in steps_titles %}
+      <tr>
+        <th title="{{ step.name }}">{{ step.parent }}</th>
+        {% for title in title_list %}
+        <th><canvas id="canvas" width="20" height="20" class="piechart" title="{{ title }}"></canvas></th>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+    {% endspaceless %}
   </body>
 </html>
