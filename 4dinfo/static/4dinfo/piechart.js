@@ -1,7 +1,7 @@
 // List the colors for the pie chart.
 // Will eventually want to link severity of errors to different colors
 
-var colors = ["#ff0000","#00ff00","#0000ff"];
+var colors = ["#ff0000","#00ff00","#0000ff","#00ffff","#ff00ff","#ffff00","#808080","#ffffff"];
 
 // This function finds multiple canvases and draws pie charts onto them
 

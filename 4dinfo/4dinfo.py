@@ -14,23 +14,30 @@ def return_page(request):
     curs = conn.cursor()
     curs.execute('CREATE TABLE workflows (stepName varchar(255), requestName varchar(255), errorCode int, siteName varchar(255), numberErrors int)')
 
-    allsteps = set()
-    allerrors = set()
-    allsites = set()
+    stepset = set()
+    errorset = set()
+    siteset = set()
 
     # Store everything into an SQL database for fast retrival
 
     for stepname in data.keys():
-        allsteps.add(stepname)
+        stepset.add(stepname)
         requestname = ''
         if len(stepname.split('/')) > 1:
             requestname = stepname.split('/')[1]
         for errorcode in data[stepname].keys():
-            allerrors.add(errorcode)
+            errorset.add(errorcode)
             for sitename in data[stepname][errorcode].keys():
-                allsites.add(sitename)
+                siteset.add(sitename)
                 numbererrors = data[stepname][errorcode][sitename]
                 curs.execute('INSERT INTO workflows VALUES (?,?,?,?,?)',(stepname, requestname, errorcode, sitename, numbererrors))
+
+    allsteps = list(stepset)
+    allsteps.sort()
+    allerrors = list(errorset)
+    allerrors.sort()
+    allsites = list(siteset)
+    allsites.sort()
 
     # Based on the dimesions from the user, create a list of pies to show
 
