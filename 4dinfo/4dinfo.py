@@ -75,7 +75,7 @@ def return_page(request):
 
     for col in allmap[colname]:
         if colname == 'errorcode':
-            passcol.append({'title' : str('\n'.join(errors_explained[col])), 'name' : col})
+            passcol.append({'title' : str('\n --- \n'.join(errors_explained[col])).rstrip('\n'), 'name' : col})
         else:
             passcol.append({'title' : col, 'name' : col})
 
@@ -83,7 +83,7 @@ def return_page(request):
         if rowname == 'stepname':
             passrow.append({'title' : row, 'name' : row.split('/')[1]})
         elif rowname == 'errorcode':
-            passrow.append({'title' : str('\n --- \n'.join(errors_explained[col])), 'name' : row.split('/')[1]})
+            passrow.append({'title' : str('\n --- \n'.join(errors_explained[row])).rstrip('\n'), 'name' : row})
         else:
             passrow.append({'title' : row, 'name' : row})
 
