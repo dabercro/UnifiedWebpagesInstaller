@@ -10,7 +10,16 @@
     <table border="3" style="border-collapse: collapse;">
       {% spaceless %}
       <tr>
-        <th></th>
+        <td style="font-size:100%; text-align:left; padding:15px;">
+          <span style="color:#0000ff;">Select a variable for the pie chart:</span>
+          <form>
+            <input type="radio" name="pievar" value="stepname"> Step Name <br>
+            <input type="radio" name="pievar" value="sitename"> Site Name <br>
+            <input type="radio" name="pievar" value="errorcode"> Error Code <br>
+            <input type="submit" value="Submit">
+            (Does nothing at the moment)
+          </form>
+        </td>
         {% for site in site_list %}
         <th class="rotate"><div><span>{{ site }}</span></div></th>
         {% endfor %}

@@ -12,7 +12,7 @@ def return_page(request):
 
     conn = sqlite3.connect(':memory:')
     curs = conn.cursor()
-    curs.execute('CREATE TABLE workflows (stepName varchar(255), requestName varchar(255), errorCode int, siteName varchar(255), numberErrors int)')
+    curs.execute('CREATE TABLE workflows (stepname varchar(255), errorcode int, sitename varchar(255), numbererrors int)')
 
     stepset = set()
     errorset = set()
@@ -20,17 +20,13 @@ def return_page(request):
 
     # Store everything into an SQL database for fast retrival
 
-    for stepname in data.keys():
+    for stepname, errorcodes in data.items():
         stepset.add(stepname)
-        requestname = ''
-        if len(stepname.split('/')) > 1:
-            requestname = stepname.split('/')[1]
-        for errorcode in data[stepname].keys():
+        for errorcode, sitenames in errorcodes.items():
             errorset.add(errorcode)
-            for sitename in data[stepname][errorcode].keys():
+            for sitename, numbererrors in sitenames.items():
                 siteset.add(sitename)
-                numbererrors = data[stepname][errorcode][sitename]
-                curs.execute('INSERT INTO workflows VALUES (?,?,?,?,?)',(stepname, requestname, errorcode, sitename, numbererrors))
+                curs.execute('INSERT INTO workflows VALUES (?,?,?,?)',(stepname, errorcode, sitename, numbererrors))
 
     allsteps = list(stepset)
     allsteps.sort()
@@ -39,11 +35,16 @@ def return_page(request):
     allsites = list(siteset)
     allsites.sort()
 
+    # Get the dimensions passed by the user
+    
+    pievar = request.GET.get('pievar','errorcode')
+
     # Based on the dimesions from the user, create a list of pies to show
 
     pieinfo = []
     pietitles = []
     passstep = []
+
     for step in allsteps:
         passstep.append({'name' : step, 'parent' : step.split('/')[1]})
         pietitlerow = []
