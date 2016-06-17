@@ -10,6 +10,11 @@ def return_page(request):
     data = json.load(res)
     res.close()
 
+    errors_location = 'https://cmst2.web.cern.ch/cmst2/unified/explanations.json'
+    res  = urllib2.urlopen(errors_location)
+    errors_explained = json.load(res)
+    res.close()
+
     conn = sqlite3.connect(':memory:')
     curs = conn.cursor()
     curs.execute('CREATE TABLE workflows (stepname varchar(255), errorcode int, sitename varchar(255), numbererrors int)')
@@ -39,33 +44,73 @@ def return_page(request):
     
     pievar = request.GET.get('pievar','errorcode')
 
+    allmap = { # lists of elements to call for each possible row and column
+        'errorcode' : allerrors,
+        'stepname' : allsteps,
+        'sitename' : allsites,
+        }
+
+    titlemap = {
+        'errorcode' : 'code ',
+        'stepname' : 'step ',
+        'sitename' : 'site ',
+        }
+
+    pievarmap = { # for each pievar : ( row, column )
+        'errorcode' : ('stepname', 'sitename','errorcode'),
+        'sitename'  : ('stepname', 'errorcode','sitename'),
+        'stepname'  : ('errorcode', 'sitename','stepname'),
+        }
+
     # Based on the dimesions from the user, create a list of pies to show
+
+    rowname, colname, varname = pievarmap[pievar]
 
     pieinfo = []
     pietitles = []
-    passstep = []
+    passrow = []
+    passcol = []
 
-    for step in allsteps:
-        passstep.append({'name' : step, 'parent' : step.split('/')[1]})
+    sqlcall = 'SELECT {0}, numbererrors FROM workflows WHERE {1}=? AND {2}=?'.format(pievar,rowname,colname)
+
+    for col in allmap[colname]:
+        if colname == 'errorcode':
+            passcol.append({'title' : str('\n'.join(errors_explained[col])), 'name' : col})
+        else:
+            passcol.append({'title' : col, 'name' : col})
+
+    for row in allmap[rowname]:
+        if rowname == 'stepname':
+            passrow.append({'title' : row, 'name' : row.split('/')[1]})
+        elif rowname == 'errorcode':
+            passrow.append({'title' : str('\n --- \n'.join(errors_explained[col])), 'name' : row.split('/')[1]})
+        else:
+            passrow.append({'title' : row, 'name' : row})
+
         pietitlerow = []
-        for site in allsites:
+
+        for col in allmap[colname]:
             errorNum = 0
             toappend = []
-            pietitle = 'site: ' + site
-            for row in curs.execute('SELECT numberErrors, errorcode FROM workflows WHERE stepName=? AND siteName=?',(step,site)):
-                if row[0] != 0:
-                    toappend.append(row[0])
-                    pietitle += '\ncode ' + str(row[1]) + ': ' + str(row[0])
+            pietitle = ''
+            if rowname != 'stepname':
+                pietitle += titlemap[rowname] + ': ' + row + '\n'
+            pietitle += titlemap[colname] + ': ' + col
+            for piekey, errnum in curs.execute(sqlcall,(row,col)):
+                if errnum != 0:
+                    toappend.append(errnum)
+                    pietitle += '\n' + titlemap[varname] + str(piekey) + ': ' + str(errnum)
             pieinfo.append(toappend)
-            pietitlerow.append(pietitle.rstrip('\n'))
+            pietitlerow.append(pietitle)
 
         pietitles.append(pietitlerow)
 
-    steps_titles = zip(passstep, pietitles)
+    row_zip = zip(passrow, pietitles)
 
     return render(request,'4dinfo/piecharts.html',{
-            'site_list' : allsites,
+            'collist' : passcol,
             'pieinfo' : pieinfo,
-            'steps_titles' : steps_titles,
+            'rowzip' : row_zip,
+            'pievar' : pievar,
             })
 

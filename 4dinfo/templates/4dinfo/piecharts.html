@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Error Numbers</title>
+    <title>4D Errors</title>
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="static/4dinfo/rotation.css"></link>
     <script type="text/javascript" src="static/4dinfo/piechart.js"></script>
@@ -9,29 +9,40 @@
   <body onload="drawpiecharts({{ pieinfo|join:',' }});">
     <table border="3" style="border-collapse: collapse;">
       {% spaceless %}
+
       <tr>
         <td style="font-size:100%; text-align:left; padding:15px;">
-          <span style="color:#0000ff;">Select a variable for the pie chart:</span>
+          <span style="color:#0000ff;">Select a variable for the pie chart <br>(the other two make up the axes):</span>
           <form>
             <input type="radio" name="pievar" value="stepname"> Step Name <br>
             <input type="radio" name="pievar" value="sitename"> Site Name <br>
             <input type="radio" name="pievar" value="errorcode"> Error Code <br>
             <input type="submit" value="Submit">
-            (Does nothing at the moment)
           </form>
         </td>
-        {% for site in site_list %}
-        <th class="rotate"><div><span>{{ site }}</span></div></th>
+
+        {% for col in collist %}
+        <th class="rotate"><div><span title="{{ col.title }}">{{ col.name }}</span></div></th>
         {% endfor %}
+
       </tr>
-      {% for step,title_list in steps_titles %}
+
+      {% for row,title_list in rowzip %}
       <tr>
-        <th title="{{ step.name }}">{{ step.parent }}</th>
+
+        {% if pievar == "stepname" %}
+        <th title="{{ row.title }}">{{ row.name }}</th>
+        {% else %}
+        <th title="{{ row.title }}"><a href="../showlog/?search={{ row.name }}">{{ row.name }}</a></th>
+        {% endif %}
+
         {% for title in title_list %}
         <th><canvas id="canvas" width="20" height="20" class="piechart" title="{{ title }}"></canvas></th>
         {% endfor %}
+
       </tr>
       {% endfor %}
+
     </table>
     {% endspaceless %}
   </body>

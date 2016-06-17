@@ -39,14 +39,17 @@ def search_logs(q):
     
 def give_logs(request):
     input = request.GET.get('search','')
+
+    formtext = 'Submit query: <form><input type="text" name="search"> <input type="submit" value="Submit"></form>'
+
     if input == '':
         # Get form page
-        return HttpResponse('Submit query: <form><input type="text" name="search"> <input type="submit" value="Submit"></form>')
+        return HttpResponse(formtext)
 
     else:
         o = search_logs(input)
         if len(o) == 0:
-            return HttpResponse('No logs were found!')
+            return HttpResponse('No logs were found!<br>' + formtext)
 
         texts = set()
         logs = list()

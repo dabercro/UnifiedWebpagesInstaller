@@ -156,9 +156,11 @@ do
 done
 
 # Finally, install packages into Django... have to automate package listing
+sed 's/PACKAGELIST/<a href="showlog">showlog</a><br><a href="4dinfo">4dinfo</a>' $fileLoc/basefiles/index.py > ~/www/$installName/index.py
 sed -i "s/INSTALLED_APPS = (/INSTALLED_APPS = ( 'showlog', '4dinfo',/g" ~/www/$installName/$installName/settings.py
 
+
 echo "Nothing seemed to break. Try out this url:"
-echo "$USER.web.cern.ch/$USER/"
+echo "$USER.web.cern.ch/$USER/$installName"
 
 # Done!
