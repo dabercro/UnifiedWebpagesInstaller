@@ -7,7 +7,7 @@ installName=$1
 # I'm going to look for django here
 # Feel free to change it, but it still has to be in your ~/www for the server I think
 
-prefixLoc=$HOME/www/python_4dtest/django
+prefixLoc=$HOME/www/python_django/django
 
 # Get desired installation name from the user.
 
