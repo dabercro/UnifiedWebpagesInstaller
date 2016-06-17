@@ -99,8 +99,12 @@ def return_page(request):
             for piekey, errnum in curs.execute(sqlcall,(row,col)):
                 if errnum != 0:
                     toappend.append(errnum)
-                    pietitle += '\n' + titlemap[varname] + str(piekey) + ': ' + str(errnum)
+                    if varname != 'stepname':
+                        pietitle += '\n' + titlemap[varname] + str(piekey) + ': ' + str(errnum)
+                    else:
+                        pietitle += '\n' + titlemap[varname] + str(piekey).split('/')[1] + ': ' + str(errnum)
             pieinfo.append(toappend)
+            pietitle = 'Total Errors: ' + str(sum(toappend)) + '\n' + pietitle
             pietitlerow.append(pietitle)
 
         pietitles.append(pietitlerow)
