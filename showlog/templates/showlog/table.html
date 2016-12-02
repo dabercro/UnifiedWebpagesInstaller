@@ -10,7 +10,11 @@
 
     <form>
       Submit another query:
-      <input type="text" name="search">
+      <input type="text" name="search" value="{{ search }}">
+      Module:
+      <input type="text" name="module" value="{{ module }}">
+      Logs Limit:
+      <input type="text" name="limit" value="{{ limit }}">
       <input type="submit" name="Submit">
     </form>
 

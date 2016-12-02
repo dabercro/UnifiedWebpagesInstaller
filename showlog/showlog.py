@@ -38,16 +38,21 @@ def search_logs(q):
     return o['hits']['hits']
     
 def give_logs(request):
-    input = request.GET.get('search','')
+    query = request.GET.get('search', '')
+    module = request.GET.get('module', '')
+    limit = int(request.GET.get('limit', 50))
 
-    formtext = 'Submit query: <form><input type="text" name="search"> <input type="submit" value="Submit"></form>'
+    formtext = ('<form>Submit query: <input type="text" name="search"> '
+                'Module: <input type="text" name="module" value="%s"> '
+                'Logs Limit: <input type="text" name="limit" value = "%i"> '
+                '<input type="submit" value="Submit"></form>' % (module, limit))
 
-    if input == '':
+    if query == '':
         # Get form page
         return HttpResponse(formtext)
 
     else:
-        o = search_logs(input)
+        o = search_logs(query)
         if len(o) == 0:
             return HttpResponse('No logs were found!<br>' + formtext)
 
@@ -55,20 +60,27 @@ def give_logs(request):
         logs = list()
 
         for i in o:
-            if len(texts)>50:
+            if len(texts) > limit:
                 break
             if i['_source']['text'] in texts:
                 continue
 
-            logs.append(
-                {
-                    'subject' : i['_source']['subject'],
-                    'date'    : i['_source']['date'],
-                    'text'    : i['_source']['text'].split('\n')
-                }
-            )
+            if not module or  i['_source']['subject'] == module:
+                logs.append(
+                    {
+                        'subject' : i['_source']['subject'],
+                        'date'    : i['_source']['date'],
+                        'text'    : i['_source']['text'].split('\n')
+                    }
+                )
 
-            texts.add( i['_source']['text'] )
+                texts.add( i['_source']['text'] )
 
-        return render(request,'showlog/table.html',
-                      { 'logs' : logs, 'meta' : o[0]['_source']['meta'].split('\n') })
+        return render(request, 'showlog/table.html',
+                      {'logs' : logs,
+                       'meta' : o[0]['_source']['meta'].split('\n'),
+                       'search' : query,
+                       'module' : module,
+                       'limit' : limit
+                      }
+                     )

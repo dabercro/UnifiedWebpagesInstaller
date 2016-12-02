@@ -73,11 +73,16 @@ def return_page(request):
 
     sqlcall = 'SELECT {0}, numbererrors FROM workflows WHERE {1}=? AND {2}=?'.format(pievar,rowname,colname)
 
+    colErrors = [0] * len(allmap[colname])
+    rowErrors = [0] * len(allmap[rowname])
+
     for col in allmap[colname]:
         if colname == 'errorcode':
             passcol.append({'title' : str('\n --- \n'.join(errors_explained[col])).rstrip('\n'), 'name' : col})
         else:
             passcol.append({'title' : col, 'name' : col})
+
+    rowCount = 0
 
     for row in allmap[rowname]:
         if rowname == 'stepname':
@@ -88,6 +93,8 @@ def return_page(request):
             passrow.append({'title' : row, 'name' : row})
 
         pietitlerow = []
+
+        colCount = 0
 
         for col in allmap[colname]:
             errorNum = 0
@@ -104,10 +111,21 @@ def return_page(request):
                     else:
                         pietitle += '\n' + titlemap[varname] + str(piekey).split('/')[1] + ': ' + str(errnum)
             pieinfo.append(toappend)
-            pietitle = 'Total Errors: ' + str(sum(toappend)) + '\n' + pietitle
+            sumErrors = sum(toappend)
+            pietitle = 'Total Errors: ' + str(sumErrors) + '\n' + pietitle
             pietitlerow.append(pietitle)
 
+            rowErrors[rowCount] += sumErrors
+            colErrors[colCount] += sumErrors
+            colCount += 1
+
         pietitles.append(pietitlerow)
+        rowCount += 1
+
+    for iRow in range(len(passrow)):
+        passrow[iRow]['title'] = 'Total errors: ' + str(rowErrors[iRow]) + '\n' + passrow[iRow]['title']
+    for iCol in range(len(passcol)):
+        passcol[iCol]['title'] = 'Total errors: ' + str(colErrors[iCol]) + '\n' + passcol[iCol]['title']
 
     row_zip = zip(passrow, pietitles)
 
