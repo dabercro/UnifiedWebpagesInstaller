@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+1;95;0c<!DOCTYPE HTML>
 <html lang=en>
   <head>
     <title>Unified Logs</title>
@@ -29,7 +29,7 @@
           <td colspan="3">
             {% spaceless %}
               {% for line in log.text %}
-                {{ line }} <br>
+                {{ line|safe }} <br>
               {% endfor %}
               <br>
             {% endspaceless %}
