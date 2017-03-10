@@ -4,7 +4,7 @@ import httplib
 import os
 import json
 
-def search_logs(q):
+def search_logs(q, size):
     # I'm not completely sure what this does. Ask Jean-Roch.
     conn = httplib.HTTPConnection('cms-elastic-fe.cern.ch:9200')
     goodquery = {
@@ -31,7 +31,7 @@ def search_logs(q):
             "meta"
             ]
         }
-    conn.request("POST", '/logs/_search?size=1000', json.dumps(goodquery))
+    conn.request("POST", '/logs/_search?size=%i' % size, json.dumps(goodquery))
     response = conn.getresponse()
     data = response.read()
     o = json.loads(data)
@@ -41,18 +41,20 @@ def give_logs(request):
     query = request.GET.get('search', '')
     module = request.GET.get('module', '')
     limit = int(request.GET.get('limit', 50))
+    size = int(request.GET.get('size', 1000))
 
     formtext = ('<form>Submit query: <input type="text" name="search"> '
                 'Module: <input type="text" name="module" value="%s"> '
-                'Logs Limit: <input type="text" name="limit" value = "%i"> '
-                '<input type="submit" value="Submit"></form>' % (module, limit))
+                'Logs Limit: <input type="text" name="limit" value="%i"> '
+                'Elastic Search Size: <input type="text" name="size" value="%i"> '
+                '<input type="submit" value="Submit"></form>' % (module, limit, size))
 
     if query == '':
         # Get form page
         return HttpResponse(formtext)
 
     else:
-        o = search_logs(query)
+        o = search_logs(query, size)
         if len(o) == 0:
             return HttpResponse('No logs were found!<br>' + formtext)
 
@@ -81,6 +83,7 @@ def give_logs(request):
                        'meta' : o[0]['_source']['meta'].split('\n'),
                        'search' : query,
                        'module' : module,
-                       'limit' : limit
+                       'limit' : limit,
+                       'size' : size
                       }
                      )
