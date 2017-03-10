@@ -7,7 +7,9 @@ installName=$1
 # I'm going to look for django here
 # Feel free to change it, but it still has to be in your ~/www for the server I think
 
-prefixLoc=$HOME/www/python_django/django
+serverRoot=/var/www/html
+
+prefixLoc=$serverRoot/python_django/django
 
 # Get desired installation name from the user.
 
@@ -23,15 +25,15 @@ fi
 
 # If the spot is not free, don't use it.
 
-if [ -d ~/www/$installName -o -f ~/www/$installName ]
+if [ -d $serverRoot/$installName -o -f $serverRoot/$installName ]
 then
     # Blatant ripoff from Homebrew because that message is funny.
-    echo "~/www/$installName already exists. Cowardly refusing to touch it."
+    echo "$serverRoot/$installName already exists. Cowardly refusing to touch it."
     exit 0
 fi
-if [ -f ~/www/cgi-bin/$installName.fcgi ]
+if [ -f $serverRoot/cgi-bin/$installName.fcgi ]
 then
-    echo "~/www/cgi-bin/$installName.fcgi already exists. Cowardly refusing to touch it."
+    echo "$serverRoot/cgi-bin/$installName.fcgi already exists. Cowardly refusing to touch it."
     exit 0
 fi
 
@@ -42,14 +44,14 @@ fileLoc=`dirname $0`
 
 # Initialize Django project.
 
-cd ~/www
+cd $serverRoot
 
 # Look for django installation
 
 if [ ! -d $prefixLoc/lib/python2.6/site-packages/django ]
 then
 
-    # It needs to be installed in ~/www
+    # It needs to be installed in $serverRoot
     # This is mostly straight from the AFS page, so that should be safe, right?
 
     if [ ! -f Django-1.6.5.tar.gz ]
@@ -116,7 +118,7 @@ then
     exit 0
 fi
 
-cd ~/www
+cd $serverRoot
 
 # This puts all sort of security keys and stuff that I don't want to show on GitHub,
 # so we're installing from scratch sort of.
@@ -129,35 +131,35 @@ cd $whereAmI
 
 # Copy a couple of files with adjustments for user settings
 
-sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@PREFIXLOC@$prefixLoc@g" > ~/www/cgi-bin/$installName.fcgi
-chmod +x ~/www/cgi-bin/$installName.fcgi
-sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/htaccess > ~/www/$installName/.htaccess
+sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/fcgi_file.fcgi | sed "s@USERHOME@$HOME@g" | sed "s@PREFIXLOC@$prefixLoc@g" > $serverRoot/cgi-bin/$installName.fcgi
+chmod +x $serverRoot/cgi-bin/$installName.fcgi
+sed "s@PROJECTNAMEHERE@$installName@g" $fileLoc/basefiles/htaccess > $serverRoot/$installName/.htaccess
 
 # Place the urls file
 
-cp $fileLoc/basefiles/urls.py ~/www/$installName/$installName/.
+cp $fileLoc/basefiles/urls.py $serverRoot/$installName/$installName/.
 
 for pack in `cat packages.txt`
 do
-    if [ ! -d ~/www/$installName/$pack ]
+    if [ ! -d $serverRoot/$installName/$pack ]
     then
-        mkdir ~/www/$installName/$pack
-        touch ~/www/$installName/$pack/__init__.py
+        mkdir $serverRoot/$installName/$pack
+        touch $serverRoot/$installName/$pack/__init__.py
         if [ $? -ne 0 ]
         then
             echo "That should have been possible..."
-            echo "Where is ~/www/$installName ???"
+            echo "Where is $serverRoot/$installName ???"
             cd $whereAmI
             exit 0
         fi
     fi
     
-    cp -r $fileLoc/$pack/* ~/www/$installName/$pack/.
+    cp -r $fileLoc/$pack/* $serverRoot/$installName/$pack/.
 done
 
 # Finally, install packages into Django... have to automate package listing
-sed 's@PACKAGELIST@<a href="showlog">showlog</a><br><a href="4dinfo">4dinfo</a>@g' $fileLoc/basefiles/index.py > ~/www/$installName/index.py
-sed -i "s/INSTALLED_APPS = (/INSTALLED_APPS = ( 'showlog', '4dinfo',/g" ~/www/$installName/$installName/settings.py
+sed 's@PACKAGELIST@<a href="showlog">showlog</a><br><a href="4dinfo">4dinfo</a>@g' $fileLoc/basefiles/index.py > $serverRoot/$installName/index.py
+sed -i "s/INSTALLED_APPS = (/INSTALLED_APPS = ( 'showlog', '4dinfo',/g" $serverRoot/$installName/$installName/settings.py
 
 
 echo "Nothing seemed to break. Try out this url:"
