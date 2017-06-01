@@ -42,12 +42,16 @@ def give_logs(request):
     module = request.GET.get('module', '')
     limit = int(request.GET.get('limit', 50))
     size = int(request.GET.get('size', 1000))
+    keep_duplicates = bool(request.GET.get('all', False))
+
+    checked = ' checked' if keep_duplicates else ''
 
     formtext = ('<form>Submit query: <input type="text" name="search"> '
                 'Module: <input type="text" name="module" value="%s"> '
                 'Logs Limit: <input type="text" name="limit" value="%i"> '
                 'Elastic Search Size: <input type="text" name="size" value="%i"> '
-                '<input type="submit" value="Submit"></form>' % (module, limit, size))
+                'Keep Duplicates: <input type="checkbox" name="all"%s> '
+                '<input type="submit"></form>' % (module, limit, size, checked))
 
     if query == '':
         # Get form page
@@ -64,7 +68,7 @@ def give_logs(request):
         for i in o:
             if len(texts) > limit:
                 break
-            if i['_source']['text'] in texts:
+            if i['_source']['text'] in texts and not keep_duplicates:
                 continue
 
             if not module or  i['_source']['subject'] == module:
@@ -84,6 +88,7 @@ def give_logs(request):
                        'search' : query,
                        'module' : module,
                        'limit' : limit,
-                       'size' : size
+                       'size' : size,
+                       'checked' : checked
                       }
                      )
